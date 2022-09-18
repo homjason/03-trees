@@ -97,8 +97,15 @@ Let's write one more function on `Day`s, to compute when a package
 will arrive by "two day shipping":
 -}
 
+-- QUESTION: Does this mean two day shipping or two business day shipping?
 twoBusinessDays :: Day -> Day
-twoBusinessDays d = undefined
+twoBusinessDays Monday = Wednesday
+twoBusinessDays Tuesday = Thursday
+twoBusinessDays Wednesday = Friday
+twoBusinessDays Thursday = Saturday
+twoBusinessDays Friday = Sunday
+twoBusinessDays Saturday = Monday
+twoBusinessDays Sunday = Tuesday
 
 {-
 Shapes
@@ -158,7 +165,7 @@ of data constructors start with capital letters so that they cannot be
 confused with normal variables, which might be the names of functions.
 
 Like functions, they can be applied to arguments. However, they have a
-*special power* that normal functions do not have: they can be used in pattern
+\*special power* that normal functions do not have: they can be used in pattern
 matching. If we have a `Shape` we can see what data constructor we used to
 create that `Shape`.
 
@@ -228,7 +235,7 @@ update all of the existing classes with the new method definition. (The
 compiler will tell us if we miss any.)
 
 This contrast between these two ways of defining data types is commonly called
-*the expression problem*.
+\*the expression problem*.
 
 Records
 =======
@@ -530,7 +537,8 @@ main = do
     TestList
       [ "safeHead" ~: safeHead oneTwoThree ~?= 1,
         "sumOfIntListNE" ~: sumOfIntListNE oneTwoThree ~?= 6,
-        "treeIncr" ~: treeIncr (Branch 1 (Branch 2 Empty Empty) Empty)
+        "treeIncr"
+          ~: treeIncr (Branch 1 (Branch 2 Empty Empty) Empty)
           ~?= Branch 2 (Branch 3 Empty Empty) Empty,
         "treePlus" ~: treePlus (Branch 2 Empty Empty) 3 ~?= Branch 5 Empty Empty,
         "infixOrder" ~: infixOrder exTree ~?= [1, 2, 4, 5, 9, 7],
