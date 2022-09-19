@@ -143,6 +143,7 @@ area (Rectangle llx lly urx ury) = width * height
     width = urx - llx
     height = ury - lly
 
+-- QUESTION: What does it mean to be first-class Haskell values again?
 {-
 Note that constructors are first-class Haskell values, and
 -- like any value -- they have types.
@@ -279,7 +280,7 @@ Rewrite this function using selectors `x` and `y`:
 -}
 
 distFromOrigin' :: Point -> Double
-distFromOrigin' p = undefined
+distFromOrigin' p = sqrt (x p * x p + y p * y p)
 
 {-
 Which version is easier to read? Opinions differ.
@@ -371,7 +372,9 @@ of `head` is not partial like the one for regular lists.)
 -- >>> safeHead oneTwoThree
 -- 1
 safeHead :: IntListNE -> Int
-safeHead = undefined
+safeHead l1 = case l1 of
+  ISingle n -> n
+  ICons n iln -> n
 
 {-
 We can define functions by recursion on `IntListNE`s too, of course. Write a function
@@ -381,7 +384,9 @@ to calculate the sum of a non-empty list of integers.
 -- >>> sumOfIntListNE oneTwoThree
 -- 6
 sumOfIntListNE :: IntListNE -> Int
-sumOfIntListNE = undefined
+sumOfIntListNE l1 = case l1 of
+  ISingle n -> n
+  ICons n iln -> n + sumOfIntListNE iln
 
 {-
 Polymorphic Datatypes
@@ -418,7 +423,7 @@ justTrue :: Maybe Bool
 justTrue = Just True
 
 justThree :: Maybe Int
-justThree = undefined
+justThree = Just 3
 
 {-
 A number of other polymorphic datatypes appear in the standard
@@ -440,7 +445,7 @@ For example, here's a safer integer division function:
 
 safeDiv :: Int -> Int -> Either String Int
 safeDiv _ 0 = Left "You can't divide by zero, silly."
-safeDiv x y = Right $ x `div` y
+safeDiv x y = Right $ x `div` y -- \$ means "application". To avoid parenthesis.
 
 {-
 Of course, `Either` is more useful when things can go wrong in more
@@ -485,7 +490,9 @@ We can write simple functions on trees by recursion:
 -- >>> treePlus (Branch 2 Empty Empty) 3
 -- Branch 5 Empty Empty
 treePlus :: Tree Int -> Int -> Tree Int
-treePlus = undefined
+treePlus tr num = case tr of
+  Empty -> Empty
+  Branch n trL trR -> Branch (n + num) (treePlus trL num) (treePlus trR num)
 
 {-
 We can accumulate all of the elements in a tree into a list:
@@ -505,13 +512,16 @@ infixOrder (Branch x l r) = infixOrder l ++ [x] ++ infixOrder r
 -- [5,2,1,4,9,7]
 
 prefixOrder :: Tree a -> [a]
-prefixOrder = undefined
+prefixOrder Empty = []
+prefixOrder (Branch x l r) = [x] ++ prefixOrder l ++ prefixOrder r
 
 {-
 (NOTE: This is a simple way of defining a tree walk in Haskell, but it is not
 the best way. In particular, the `infixOrder` function is *not* linear in the
 number of nodes in the tree. Why?  Can you think of a way to rewrite
 `infixOrder` so that it runs in linear time?)
+
+-- QUESTION: How can you rewrite the above?
 
 But, of course, what we should really do is reimplement our
 higher-order patterns for trees!
